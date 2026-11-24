@@ -697,7 +697,7 @@ var CFG = {
   /* Música: archivo propio si hay audioSrc, si no una melodía de caja musical sintetizada */
   var Music = (function () {
     var btn = document.getElementById("music-btn");
-    var ctx, master, timer, nextT = 0, bar = 0, playing = false, wantPlay = false, started = false, el = null;
+    var ctx, master, timer, nextT = 0, barIdx = 0, playing = false, wantPlay = false, started = false, el = null;
     var BEAT = 60 / 150;
     var SEMI = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
     function hz(n) { var acc = n.charAt(1) === "#" ? 1 : 0, oct = parseInt(n.charAt(n.length - 1), 10); return 440 * Math.pow(2, (12 * (oct + 1) + SEMI[n.charAt(0)] + acc - 69) / 12); }
@@ -752,7 +752,7 @@ var CFG = {
       d.m.forEach(function (x) { if (x[0] !== "R") strings(hz(x[0]), t + off * BEAT, x[1] * BEAT * .97, .1); off += x[1]; });
     }
     function pump() {
-      while (nextT < ctx.currentTime + 1.2) { scheduleBar(nextT, BARS[bar % BARS.length]); bar++; nextT += 3 * BEAT; }
+      while (nextT < ctx.currentTime + 1.2) { scheduleBar(nextT, BARS[barIdx % BARS.length]); barIdx++; nextT += 3 * BEAT; }
     }
     function synthStart() {
       if (!ctx) {
