@@ -12,26 +12,37 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Preparar el sitio
+        run: |
+          if [ ! -f index.html ]; then
+            echo "::error::No se encontró index.html en la raíz del repositorio"
+            exit 1
+          fi
+          mkdir _site
+          cp index.html _site/
+          if [ -d audio ]; then cp -r audio _site/; fi
+
+      - name: Subir el sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Descargar el código
-        uses: actions/checkout@v4
-
-      - name: Configurar Pages
-        uses: actions/configure-pages@v5
-
-      - name: Subir el sitio
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
