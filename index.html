@@ -363,7 +363,6 @@ button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation
           </defs>
           <circle cx="94" cy="108" r="70" fill="url(#mg)" mask="url(#mm)"/>
         </svg>
-        <span class="moon-letter" data-bind="initial"></span>
         <span class="spark" style="left:6%;top:18%;--del:.2s"></span>
         <span class="spark" style="right:8%;top:30%;--del:1.1s"></span>
         <span class="spark" style="right:20%;bottom:10%;--del:1.8s"></span>
@@ -699,18 +698,29 @@ var CFG = {
   var Music = (function () {
     var btn = document.getElementById("music-btn");
     var ctx, master, timer, nextT = 0, bar = 0, playing = false, wantPlay = false, started = false, el = null;
-    var BEAT = 60 / 82;
+    var BEAT = 60 / 150;
     var SEMI = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-    function hz(n) { return 440 * Math.pow(2, (12 * (parseInt(n.charAt(1), 10) + 1) + SEMI[n.charAt(0)] - 69) / 12); }
+    function hz(n) { var acc = n.charAt(1) === "#" ? 1 : 0, oct = parseInt(n.charAt(n.length - 1), 10); return 440 * Math.pow(2, (12 * (oct + 1) + SEMI[n.charAt(0)] + acc - 69) / 12); }
+    /* Vals en re mayor, compás de 3/4: bajo en el primer tiempo y acordes en el segundo y tercero */
+    var D_ = { b: "D3", c: ["A3", "D4", "F#4"] }, A_ = { b: "A2", c: ["A3", "C#4", "E4"] }, G_ = { b: "G2", c: ["B3", "D4", "G4"] };
+    function bar(ch, m) { return { b: ch.b, c: ch.c, m: m }; }
     var BARS = [
-      { b: "C3", c: ["E4", "G4"], m: [["E5", 1], ["G5", 1], ["E5", 1]] },
-      { b: "A2", c: ["C4", "E4"], m: [["E5", 1.5], ["D5", .5], ["C5", 1]] },
-      { b: "F2", c: ["A3", "C4"], m: [["C5", 1], ["F5", 1], ["E5", 1]] },
-      { b: "G2", c: ["B3", "D4"], m: [["D5", 2], ["B4", 1]] },
-      { b: "C3", c: ["E4", "G4"], m: [["G5", 1], ["E5", 1], ["C5", 1]] },
-      { b: "A2", c: ["C4", "E4"], m: [["A4", 1], ["C5", 1], ["E5", 1]] },
-      { b: "F2", c: ["A3", "C4"], m: [["F5", 1.5], ["E5", .5], ["D5", 1]] },
-      { b: "G2", c: ["B3", "D4"], m: [["C5", 3]] }
+      bar(D_, [["D4", 1], ["F#4", 1], ["A4", 1]]),
+      bar(D_, [["A5", 3]]),
+      bar(D_, [["A5", 1], ["F#5", 1], ["D5", 1]]),
+      bar(A_, [["E5", 3]]),
+      bar(A_, [["A4", 1], ["C#5", 1], ["E5", 1]]),
+      bar(A_, [["E5", 2], ["F#5", 1]]),
+      bar(A_, [["E5", 1], ["D5", 1], ["C#5", 1]]),
+      bar(D_, [["D5", 3]]),
+      bar(G_, [["B4", 1], ["D5", 1], ["G5", 1]]),
+      bar(G_, [["G5", 2], ["F#5", 1]]),
+      bar(D_, [["E5", 1], ["D5", 1], ["F#5", 1]]),
+      bar(D_, [["A4", 3]]),
+      bar(A_, [["C#5", 1], ["E5", 1], ["A5", 1]]),
+      bar(A_, [["A5", 2], ["G5", 1]]),
+      bar(A_, [["F#5", 1], ["E5", 1], ["C#5", 1]]),
+      bar(D_, [["D5", 2], ["R", 1]])
     ];
     function voice(f, t, dur, g, type) {
       var o = ctx.createOscillator(), o2 = ctx.createOscillator(), a = ctx.createGain();
@@ -723,11 +733,23 @@ var CFG = {
       o.connect(a); o2.connect(a2); a2.connect(a); a.connect(master);
       o.start(t); o2.start(t); o.stop(t + dur + .05); o2.stop(t + dur + .05);
     }
+    function strings(f, t, dur, g) {
+      var o = ctx.createOscillator(), o2 = ctx.createOscillator(), fl = ctx.createBiquadFilter(), a = ctx.createGain();
+      o.type = "sawtooth"; o2.type = "sawtooth";
+      o.frequency.value = f; o2.frequency.value = f; o.detune.value = -7; o2.detune.value = 7;
+      fl.type = "lowpass"; fl.frequency.value = 1700; fl.Q.value = .3;
+      a.gain.setValueAtTime(0.0001, t);
+      a.gain.linearRampToValueAtTime(g, t + .07);
+      a.gain.setValueAtTime(g, t + Math.max(.08, dur - .1));
+      a.gain.exponentialRampToValueAtTime(0.0001, t + dur + .12);
+      o.connect(fl); o2.connect(fl); fl.connect(a); a.connect(master);
+      o.start(t); o2.start(t); o.stop(t + dur + .2); o2.stop(t + dur + .2);
+    }
     function scheduleBar(t, d) {
-      voice(hz(d.b), t, BEAT * 2.6, .5, "triangle");
-      d.c.forEach(function (n) { voice(hz(n), t + BEAT, BEAT * 1.4, .12); voice(hz(n), t + 2 * BEAT, BEAT * 1.4, .1); });
+      voice(hz(d.b), t, BEAT * 1.9, .42, "triangle");
+      d.c.forEach(function (n) { voice(hz(n), t + BEAT, BEAT * .9, .09, "triangle"); voice(hz(n), t + 2 * BEAT, BEAT * .9, .08, "triangle"); });
       var off = 0;
-      d.m.forEach(function (x) { voice(hz(x[0]), t + off * BEAT, BEAT * (x[1] + 1.2), .26); off += x[1]; });
+      d.m.forEach(function (x) { if (x[0] !== "R") strings(hz(x[0]), t + off * BEAT, x[1] * BEAT * .97, .1); off += x[1]; });
     }
     function pump() {
       while (nextT < ctx.currentTime + 1.2) { scheduleBar(nextT, BARS[bar % BARS.length]); bar++; nextT += 3 * BEAT; }
