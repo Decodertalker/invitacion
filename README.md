@@ -18,4 +18,6 @@ nombres, padres, fecha y hora, lugares, itinerario, dress code, número de Whats
 
 - **Hora de la misa y de la recepción:** `places` y `schedule`.
 - **Dirección de la misa:** cambia `title` y `where`, y agrega en `map` el nombre del lugar para que aparezca el botón "Ver ubicación".
-- **Música propia:** crea la carpeta `audio/`, sube `cancion.mp3` y escribe `audioSrc: "audio/cancion.mp3"`. Si queda vacío suena una melodía de caja musical.
+- **Música propia:** crea la carpeta `audio/`, sube `cancion.mp3` y escribe `audioSrc: "audio/cancion.mp3"`. La carpeta `audio/` debe subirse junto con `index.html`.
+
+- **Fecha límite para confirmar:** `rsvpBy` en `CFG` (año, mes, día). Pasada esa fecha el botón y el número de WhatsApp desaparecen y se muestra un mensaje de plazo terminado.
