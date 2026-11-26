@@ -479,6 +479,11 @@ button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation
 .deadline{display:inline-flex;flex-direction:column;gap:2px;margin-top:22px;padding:16px 30px;border-radius:14px;background:rgba(255,255,255,.75);border:1px solid var(--line);box-shadow:0 10px 26px -14px rgba(70,110,180,.5)}
 .deadline strong{font-family:var(--font-display);font-variant:small-caps;font-weight:500;font-size:1.9rem;line-height:1.2;color:#4f7bc4}
 .deadline em{font-family:var(--font-display);font-size:1.15rem;color:var(--muted)}
+.pass{display:inline-flex;align-items:center;justify-content:center;gap:10px;max-width:92%;text-align:center;line-height:1.35;margin-top:20px;padding:11px 22px;border-radius:999px;background:linear-gradient(135deg,#8fb3ec,#5f89cf);color:#fff;font-size:.95rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;box-shadow:0 10px 22px -12px rgba(70,110,180,.8)}
+.pass b{font-weight:600}
+.adults{display:block;max-width:340px;margin:22px auto 0;padding:16px 22px;border-radius:14px;background:rgba(255,255,255,.88);border:1.5px solid #5f89cf;box-shadow:0 10px 26px -14px rgba(70,110,180,.6);text-align:center}
+.adults strong{display:block;font-family:var(--font-display);font-variant:small-caps;font-weight:600;font-size:1.45rem;line-height:1.25;color:#3f69b5;letter-spacing:.04em}
+.adults span{display:block;margin-top:4px;font-size:.95rem;color:#5b76ad}
 @media(min-width:900px){.corner{width:250px;height:250px}.bfly{width:60px}#gate .crown{width:200px}}
 /* princesa + modo claro forzado */
 html{background:#eaf3fc}
@@ -508,8 +513,8 @@ html{background:#eaf3fc}
   <div class="valance" aria-hidden="true"><div class="v-silver"></div><div class="v-vel"></div></div>
   <div class="gate-content">
     <p class="eyebrow">Estás invitado</p>
-    <p class="gate-name" data-bind="name"></p>
     <p class="mis15"><span>Mis</span> <b>15</b> <span>años</span></p>
+    <p class="gate-name" data-bind="name"></p>
     <button id="seal-btn" type="button" aria-label="Abrir invitación"><span class="orbit" aria-hidden="true"></span><span data-bind="initial"></span></button>
     <p class="eyebrow">Toca el sello para abrir</p>
   </div>
@@ -638,7 +643,10 @@ html{background:#eaf3fc}
       <p class="eyebrow" data-rv="up">Confirma tu asistencia</p>
       <h2 class="display" style="margin:10px 0 16px" data-rv="up">Tu presencia es muy importante</h2>
       <p class="lead" data-rv="up">Por favor confírmame por WhatsApp antes de la fecha límite.</p>
+      <p class="pass" data-rv="zoom"><span aria-hidden="true">✦</span><span>Pase reservado para <b>1 persona</b></span></p>
+      <br>
       <div class="deadline" data-rv="zoom"><span class="eyebrow">Fecha límite para confirmar</span><strong id="rsvp-date"></strong><em id="rsvp-left"></em></div>
+      <div class="adults" data-rv="zoom"><strong>Evento exclusivo para adultos</strong><span>Gracias por su comprensión.</span></div>
       <p id="rsvp-btn" style="margin-top:24px" data-rv="zoom"><a class="btn" id="rsvp-link" href="#" target="_blank" rel="noopener">Confirmar aquí</a></p>
       <p class="closed" id="rsvp-closed" hidden></p>
       <p class="num" id="phone" data-rv="fade"></p>
